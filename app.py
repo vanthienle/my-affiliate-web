@@ -16,7 +16,6 @@ BASE_DOMAIN = "https://bot-shopping.onrender.com"
 DB_PATH = "links.db"
 
 def init_db():
-    """Khởi tạo SQLite Database lưu trữ mã rút gọn"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''
@@ -33,17 +32,19 @@ def init_db():
 init_db()
 
 def generate_short_code(length=6):
-    """Tạo ngẫu nhiên mã chuỗi rút gọn 6 ký tự"""
     chars = string.ascii_letters + string.digits
     return ''.join(random.choice(chars) for _ in range(length))
 
 @app.route('/', methods=['GET'])
 def index():
-    return jsonify({"status": "running", "service": "Zalo Affiliate Web Service"})
+    return jsonify({
+        "status": "running", 
+        "service": "Zalo Affiliate Web Service",
+        "login_url": f"{BASE_DOMAIN}/login"
+    })
 
 @app.route('/api/convert', methods=['POST'])
 def convert_url():
-    """API rút gọn link dạng /s/<code>"""
     data = request.json or {}
     raw_url = data.get('url', '').strip()
     if not raw_url:
@@ -63,7 +64,6 @@ def convert_url():
 
 @app.route('/s/<code>', methods=['GET'])
 def redirect_short_link(code):
-    """Điều hướng link rút gọn sang link sản phẩm/affiliate gốc"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('SELECT original_url, affiliate_url FROM links WHERE code = ?', (code,))
@@ -77,7 +77,6 @@ def redirect_short_link(code):
 
 @app.route('/api/login-tracking', methods=['POST'])
 def login_tracking():
-    """API Đăng nhập bằng Mã theo dõi do Bot Zalo cấp"""
     data = request.json or {}
     tracking_code = data.get('tracking_code', '').strip().lower()
 
@@ -94,7 +93,6 @@ def login_tracking():
 
 @app.route('/api/user-orders', methods=['GET'])
 def get_user_orders():
-    """API Lấy danh sách đơn hàng tra soát theo Mã theo dõi"""
     tracking_code = request.args.get('tracking_code') or session.get('user_utm')
     if not tracking_code:
         return jsonify({"success": False, "message": "Chưa cung cấp Mã theo dõi"}), 401
