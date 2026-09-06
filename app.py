@@ -76,7 +76,7 @@ def index():
             </nav>
 
             <div class="flex gap-2">
-                <a href="https://zalo.me/" target="_blank" class="px-4 py-2.5 rounded-full bg-[#0068FF] hover:bg-blue-600 text-white font-medium text-sm shadow-md transition flex items-center gap-2">
+                <a href="https://zalo.me/g/gzjkxxocyzaaacu81hp6" target="_blank" class="px-4 py-2.5 rounded-full bg-[#0068FF] hover:bg-blue-600 text-white font-medium text-sm shadow-md transition flex items-center gap-2">
                     <i class="fa-solid fa-users text-xs"></i> <span class="hidden sm:inline">Vào nhóm Zalo</span>
                 </a>
                 <a href="/login" class="px-4 py-2.5 rounded-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-sm shadow-sm transition flex items-center gap-2">
@@ -119,7 +119,7 @@ def index():
 
                 <!-- Input Box Group -->
                 <div class="flex flex-col md:flex-row gap-3">
-                    <button type="button" id="pasteBtn" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl font-medium text-sm transition flex items-center justify-center gap-2">
+                    <button type="button" id="pasteBtn" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl font-medium text-sm transition flex items-center justify-center gap-2 whitespace-nowrap">
                         <i class="fa-solid fa-paste"></i> Dán link
                     </button>
                     
@@ -128,26 +128,27 @@ def index():
                                class="w-full bg-slate-50 border border-slate-200 focus:border-[#0068FF] focus:bg-white focus:ring-4 focus:ring-blue-500/10 rounded-2xl px-5 py-3.5 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm">
                     </div>
 
-                    <button type="button" id="convertBtn" class="px-8 py-3.5 bg-[#0068FF] hover:bg-blue-700 text-white font-semibold rounded-2xl transition shadow-lg shadow-blue-500/30 text-sm flex items-center justify-center gap-2">
+                    <button type="button" id="convertBtn" class="px-8 py-3.5 bg-[#0068FF] hover:bg-blue-700 text-white font-semibold rounded-2xl transition shadow-lg shadow-blue-500/30 text-sm flex items-center justify-center gap-2 whitespace-nowrap">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo Link
                     </button>
                 </div>
 
                 <!-- KHU VỰC HIỆN KẾT QUẢ LINK AFTER CONVERT -->
                 <div id="resultBox" class="hidden mt-6 pt-6 border-t border-slate-100">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Link chia sẻ của bạn:</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">LINK CHIA SẺ CỦA BẠN:</label>
                     <div class="flex gap-2">
                         <input type="text" id="outLink" readonly class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-700 font-semibold rounded-xl px-4 py-3 text-sm focus:outline-none">
-                        <button type="button" id="copyBtn" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl text-sm transition flex items-center gap-2">
-                            <i class="fa-solid fa-copy"></i> Copy
-                        </button>
+                        <!-- NÚT MUA NGAY -->
+                        <a href="#" id="buyBtn" target="_blank" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl text-sm transition flex items-center justify-center gap-2 whitespace-nowrap">
+                            <i class="fa-solid fa-cart-shopping"></i> Mua ngay
+                        </a>
                     </div>
                 </div>
             </div>
 
             <!-- Nút Action Phụ -->
             <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="https://zalo.me/" target="_blank" class="px-8 py-3.5 bg-white border-2 border-[#0068FF] text-[#0068FF] hover:bg-blue-50 font-semibold rounded-full transition text-sm inline-flex items-center justify-center gap-2">
+                <a href="https://zalo.me/g/gzjkxxocyzaaacu81hp6" target="_blank" class="px-8 py-3.5 bg-white border-2 border-[#0068FF] text-[#0068FF] hover:bg-blue-50 font-semibold rounded-full transition text-sm inline-flex items-center justify-center gap-2">
                     <i class="fa-solid fa-users"></i> Tham gia cộng đồng Zalo
                 </a>
                 <a href="/login" class="px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-full shadow-lg transition text-sm inline-flex items-center justify-center gap-2">
@@ -187,19 +188,15 @@ def index():
 
                 const result = await res.json();
                 if (result.success) {
+                    // Gán link vào ô input hiển thị
                     document.getElementById('outLink').value = result.data.short_link;
+                    // Gắn trực tiếp link vào href của nút "Mua ngay"
+                    document.getElementById('buyBtn').href = result.data.short_link;
+                    
                     document.getElementById('resultBox').classList.remove('hidden');
                 } else {
                     alert('Lỗi chuyển đổi link!');
                 }
-            });
-
-            // Xử lý Sao Chép
-            document.getElementById('copyBtn').addEventListener('click', () => {
-                const outLink = document.getElementById('outLink');
-                outLink.select();
-                document.execCommand('copy');
-                alert('Đã sao chép link thành công!');
             });
         </script>
     </body>
