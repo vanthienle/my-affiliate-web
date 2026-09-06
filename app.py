@@ -36,7 +36,7 @@ def generate_short_code(length=6):
     return ''.join(random.choice(chars) for _ in range(length))
 
 # ==========================================
-# 1. TRANG CHỦ (LANDING PAGE GIỚI THIỆU)
+# 1. TRANG CHỦ (CONVERT LINK NAY TRÊN WEB)
 # ==========================================
 
 @app.route('/', methods=['GET'])
@@ -47,79 +47,162 @@ def index():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Zalo Shopping Affiliate Portal</title>
+        <title>Chuyển Đổi Link Mua Sắm - Nhận Hoa Hồng</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
-    <body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col justify-between">
-        <!-- Header / Navigation -->
-        <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-            <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                    </div>
-                    <span class="font-bold text-lg text-white tracking-wide">Zalo Shopping Bot</span>
+    <body class="bg-[#FAF8F5] text-slate-800 font-sans min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+        
+        <!-- Hình trang trí phông nền -->
+        <div class="absolute -top-20 -left-20 w-80 h-80 bg-red-100/50 rounded-full blur-3xl -z-10"></div>
+        <div class="absolute top-1/3 -right-20 w-96 h-96 bg-orange-100/40 rounded-full blur-3xl -z-10"></div>
+
+        <!-- HEADER / NAVIGATION -->
+        <header class="max-w-6xl w-full mx-auto px-4 py-6 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-red-500/20">
+                    <i class="fa-solid fa-gift text-xl"></i>
                 </div>
-                <a href="/login" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition shadow-lg shadow-blue-600/30 flex items-center gap-2">
-                    <i class="fa-solid fa-right-to-bracket"></i> Đăng Nhập ID
-                </a>
             </div>
+
+            <nav class="hidden md:flex items-center gap-1 bg-white/80 backdrop-blur border border-slate-200/80 rounded-full px-3 py-1.5 shadow-sm">
+                <a href="/" class="px-4 py-2 rounded-full bg-red-50 text-red-600 font-medium text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-house text-xs"></i> Trang chủ
+                </a>
+                <a href="/login" class="px-4 py-2 rounded-full hover:bg-slate-100 text-slate-600 font-medium text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i> Tra cứu đơn hàng
+                </a>
+                <a href="/login" class="px-4 py-2 rounded-full hover:bg-slate-100 text-slate-600 font-medium text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-wallet text-xs"></i> Ví của bạn
+                </a>
+                <a href="#guide" class="px-4 py-2 rounded-full hover:bg-slate-100 text-slate-600 font-medium text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-xs"></i> Hướng dẫn
+                </a>
+            </nav>
+
+            <a href="/login" class="px-5 py-2.5 rounded-full bg-white border border-red-200 hover:bg-red-50 text-red-600 font-medium text-sm shadow-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-right-to-bracket text-xs"></i> Đăng nhập ID
+            </a>
         </header>
 
-        <!-- Hero Section -->
-        <main class="max-w-6xl mx-auto px-6 py-16 flex-1 flex flex-col items-center justify-center text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold mb-6">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Hệ Thống Tự Động Hóa Affiliate Zalo Active
+        <!-- MAIN HERO CONTENT -->
+        <main class="max-w-4xl mx-auto px-4 py-12 text-center flex-1 flex flex-col items-center justify-center">
+            
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-50 border border-red-100 text-red-500 text-xs font-semibold mb-6">
+                <span>✨ Nền tảng Affiliate uy tín tại Việt Nam</span>
             </div>
 
-            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight max-w-4xl">
-                Tự Động Tạo Link & Tra Cứu Hoa Hồng Mua Sắm Dễ Dàng
+            <h1 class="text-4xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight">
+                Chuyển đổi link mua sắm<br/>
+                <span class="text-[#E85B46]">Nhận hoa hồng</span>
             </h1>
-            <p class="text-slate-400 text-base md:text-lg max-w-2xl mb-10">
-                Gửi link Shopee/TikTok vào nhóm Zalo để nhận ngay link rút gọn. Đăng nhập bằng Mã Theo Dõi cá nhân để kiểm tra lịch sử đơn hàng và hoa hồng trực tiếp trên Web.
+
+            <p class="text-slate-500 text-base md:text-lg mb-10 max-w-xl">
+                Hoa hồng các đơn hàng từ Shopee, Lazada, TikTok Shop — công khai, minh bạch
             </p>
 
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-md">
-                <a href="/login" class="py-4 px-8 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition shadow-xl shadow-blue-600/30 flex items-center justify-center gap-3 text-base">
-                    <i class="fa-solid fa-key"></i> Đăng Nhập Tra Cứu Đơn Hàng
-                </a>
+            <!-- KHUNG DÁN LINK CONVERT TRỰC TIẾP -->
+            <div class="w-full bg-white rounded-3xl p-4 md:p-6 shadow-xl shadow-slate-200/50 border border-slate-100 text-left">
+                
+                <!-- Bảng các sàn hỗ trợ -->
+                <div class="flex items-center gap-6 mb-4 px-2">
+                    <span class="flex items-center gap-1.5 text-xs font-semibold text-orange-600">
+                        <i class="fa-solid fa-bag-shopping"></i> Shopee
+                    </span>
+                    <span class="flex items-center gap-1.5 text-xs font-semibold text-slate-900">
+                        <i class="fa-brands fa-tiktok"></i> TikTok
+                    </span>
+                    <span class="flex items-center gap-1.5 text-xs font-semibold text-blue-600">
+                        <i class="fa-solid fa-layer-group"></i> Lazada
+                    </span>
+                </div>
+
+                <!-- Input Box Group -->
+                <div class="flex flex-col md:flex-row gap-2">
+                    <button type="button" id="pasteBtn" class="px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-2xl font-medium text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paste"></i> Dán
+                    </button>
+                    
+                    <div class="flex-1 relative">
+                        <input type="text" id="rawUrl" placeholder="Dán link sản phẩm..." 
+                               class="w-full bg-slate-50 border border-slate-200 focus:border-red-400 focus:bg-white rounded-2xl px-4 py-3.5 text-slate-800 placeholder-slate-400 focus:outline-none transition text-sm">
+                    </div>
+
+                    <button type="button" id="convertBtn" class="px-6 py-3.5 bg-[#E85B46] hover:bg-[#d44a36] text-white font-medium rounded-2xl transition shadow-lg shadow-red-500/20 text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-diagram-project"></i> Chuyển đổi link
+                    </button>
+                </div>
+
+                <p class="text-xs text-slate-400 mt-3 px-2">
+                    ≡ Dán nhiều link chuyển đổi cùng lúc, mỗi link 1 dòng
+                </p>
+
+                <!-- KHU VỰC HIỆN KẾT QUẢ LINK AFTER CONVERT -->
+                <div id="resultBox" class="hidden mt-6 pt-6 border-t border-slate-100">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Link rút gọn của bạn:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="outLink" readonly class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-700 font-medium rounded-xl px-4 py-3 text-sm focus:outline-none">
+                        <button type="button" id="copyBtn" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-sm transition">
+                            <i class="fa-solid fa-copy"></i> Sao chép
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Features Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 text-left w-full">
-                <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700/60 hover:border-slate-600 transition">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mb-4">
-                        <i class="fa-solid fa-bolt"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Chuyển Link Siêu Tốc</h3>
-                    <p class="text-slate-400 text-sm">Bot tự động bắt link Shopee, TikTok, Lazada trên Zalo và chuyển sang link Affiliate trong giây lát.</p>
-                </div>
-
-                <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700/60 hover:border-slate-600 transition">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Dự Báo Hoa Hồng</h3>
-                    <p class="text-slate-400 text-sm">Hiển thị tỷ lệ hoa hồng % chính xác theo từng ngành hàng ngay khi bạn gửi sản phẩm vào nhóm.</p>
-                </div>
-
-                <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700/60 hover:border-slate-600 transition">
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl mb-4">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Mã Theo Dõi Riêng Bịêt</h3>
-                    <p class="text-slate-400 text-sm">Mỗi thành viên có Mã ID riêng do Bot cấp (`\id`) để bảo mật thông tin và xem đơn hàng cá nhân.</p>
-                </div>
+            <!-- Nút Bắt đầu miễn phí -->
+            <div class="mt-8">
+                <a href="/login" class="px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-full shadow-lg transition text-sm inline-flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-yellow-400"></i> Bắt đầu miễn phí
+                </a>
             </div>
         </main>
 
-        <!-- Footer -->
-        <footer class="border-t border-slate-800 bg-slate-900 py-6 text-center text-xs text-slate-500">
-            © 2026 Zalo Affiliate Portal. All rights reserved.
+        <footer class="py-6 text-center text-xs text-slate-400 border-t border-slate-200/60">
+            © 2026 Zalo Shopping Affiliate. Tất cả quyền được bảo lưu.
         </footer>
+
+        <script>
+            // Xử lý nút Dán từ Clipboard
+            document.getElementById('pasteBtn').addEventListener('click', async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    document.getElementById('rawUrl').value = text;
+                } catch (err) {
+                    alert('Hãy cấp quyền truy cập Clipboard hoặc dán thủ công!');
+                }
+            });
+
+            // Xử lý Chuyển đổi Link
+            document.getElementById('convertBtn').addEventListener('click', async () => {
+                const url = document.getElementById('rawUrl').value.trim();
+                if (!url) {
+                    alert('Vui lòng dán link sản phẩm cần chuyển đổi!');
+                    return;
+                }
+
+                const res = await fetch('/api/convert', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ url: url })
+                });
+
+                const result = await res.json();
+                if (result.success) {
+                    document.getElementById('outLink').value = result.data.short_link;
+                    document.getElementById('resultBox').classList.remove('hidden');
+                } else {
+                    alert('Lỗi chuyển đổi link!');
+                }
+            });
+
+            // Xử lý Sao Chép
+            document.getElementById('copyBtn').addEventListener('click', () => {
+                const outLink = document.getElementById('outLink');
+                outLink.select();
+                document.execCommand('copy');
+                alert('Đã sao chép link thành công!');
+            });
+        </script>
     </body>
     </html>
     """
@@ -137,41 +220,41 @@ def login_page():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Đăng Nhập Mã Theo Dõi - Zalo Affiliate</title>
+        <title>Đăng Nhập Tra Cứu - Zalo Affiliate</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
-    <body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
-        <div class="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
-            <a href="/" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 mb-6 transition">
+    <body class="bg-[#FAF8F5] text-slate-800 min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+            <a href="/" class="text-xs text-slate-400 hover:text-slate-700 flex items-center gap-1 mb-6 transition">
                 <i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ
             </a>
 
             <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                <div class="w-10 h-10 rounded-2xl bg-red-500 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-red-500/20">
                     <i class="fa-solid fa-key"></i>
                 </div>
-                <h2 class="text-xl font-bold">Đăng Nhập Tra Cứu</h2>
+                <h2 class="text-xl font-bold text-slate-900">Đăng Nhập Tra Cứu</h2>
             </div>
             
-            <p class="text-slate-400 text-sm mb-6">Nhập Mã theo dõi do Bot Zalo cấp (Ví dụ: <code class="text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">zalo_vandotcf</code>) để kiểm tra đơn hàng.</p>
+            <p class="text-slate-500 text-xs mb-6">Nhập Mã theo dõi do Bot Zalo cấp (Ví dụ: <code class="text-red-500 bg-red-50 px-2 py-0.5 rounded font-bold">zalo_vandotcf</code>) để kiểm tra đơn hàng.</p>
 
             <form id="loginForm" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Mã Theo Dõi Cá Nhân</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Mã Theo Dõi Cá Nhân</label>
                     <input type="text" id="trackingCode" placeholder="zalo_..." required 
-                           class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
+                           class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-red-400 transition text-sm">
                 </div>
                 
-                <div id="errMsg" class="hidden text-red-400 text-xs bg-red-500/10 p-3 rounded-xl border border-red-500/20"></div>
+                <div id="errMsg" class="hidden text-red-500 text-xs bg-red-50 p-3 rounded-xl border border-red-100"></div>
 
-                <button type="submit" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+                <button type="submit" class="w-full py-3.5 px-4 rounded-2xl bg-[#E85B46] hover:bg-[#d44a36] text-white font-medium transition shadow-lg shadow-red-500/20 flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-magnifying-glass"></i> Xem Đơn Hàng & Hoa Hồng
                 </button>
             </form>
 
-            <div class="mt-6 pt-6 border-t border-slate-700/50 text-center text-xs text-slate-400">
-                Chưa có mã? Vào nhóm Zalo gõ <code class="text-emerald-400 font-bold">\id</code> để nhận mã cá nhân.
+            <div class="mt-6 pt-6 border-t border-slate-100 text-center text-xs text-slate-400">
+                Chưa có mã? Vào nhóm Zalo gõ <code class="text-red-500 font-bold">\id</code> để nhận mã cá nhân.
             </div>
         </div>
 
@@ -217,27 +300,27 @@ def orders_page():
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
-    <body class="bg-slate-900 text-white min-h-screen p-4 md:p-8">
+    <body class="bg-[#FAF8F5] text-slate-800 min-h-screen p-4 md:p-8">
         <div class="max-w-4xl mx-auto">
-            <div class="flex items-center justify-between mb-8 bg-slate-800 p-6 rounded-2xl border border-slate-700">
+            <div class="flex items-center justify-between mb-6 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                 <div>
-                    <h1 class="text-2xl font-bold">📋 Báo Cáo Đơn Hàng & Hoa Hồng</h1>
-                    <p class="text-slate-400 text-sm mt-1">Mã theo dõi: <span id="userCode" class="text-blue-400 font-mono font-bold bg-blue-500/10 px-2 py-0.5 rounded"></span></p>
+                    <h1 class="text-2xl font-bold text-slate-900">📋 Báo Cáo Đơn Hàng & Hoa Hồng</h1>
+                    <p class="text-slate-500 text-xs mt-1">Mã theo dõi: <span id="userCode" class="text-red-500 font-mono font-bold bg-red-50 px-2 py-0.5 rounded"></span></p>
                 </div>
                 <div class="flex gap-2">
-                    <a href="/" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs rounded-xl transition flex items-center gap-1">
+                    <a href="/" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs rounded-xl font-medium transition flex items-center gap-1">
                         <i class="fa-solid fa-house"></i> Trang chủ
                     </a>
-                    <a href="/login" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-xl transition flex items-center gap-1">
+                    <a href="/login" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs rounded-xl font-medium transition flex items-center gap-1">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i> Đổi Mã
                     </a>
                 </div>
             </div>
 
-            <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+            <div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-xl">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-300">
-                        <thead class="bg-slate-900/50 text-xs uppercase text-slate-400 border-b border-slate-700">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-xs uppercase text-slate-400 border-b border-slate-100">
                             <tr>
                                 <th class="p-4">Mã Đơn</th>
                                 <th class="p-4">Sản Phẩm</th>
@@ -246,8 +329,8 @@ def orders_page():
                                 <th class="p-4">Trạng Thái</th>
                             </tr>
                         </thead>
-                        <tbody id="ordersTable" class="divide-y divide-slate-700/50">
-                            <tr><td colspan="5" class="p-8 text-center text-slate-500">Đang tải dữ liệu đơn hàng...</td></tr>
+                        <tbody id="ordersTable" class="divide-y divide-slate-100">
+                            <tr><td colspan="5" class="p-8 text-center text-slate-400">Đang tải dữ liệu đơn hàng...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -266,20 +349,20 @@ def orders_page():
                 
                 if (data.success && data.orders.length > 0) {
                     tbody.innerHTML = data.orders.map(o => `
-                        <tr class="hover:bg-slate-700/30 transition">
+                        <tr class="hover:bg-slate-50 transition">
                             <td class="p-4 font-mono text-xs text-slate-400">${o.order_id}</td>
-                            <td class="p-4 font-medium text-white">${o.product_name}</td>
+                            <td class="p-4 font-medium text-slate-800">${o.product_name}</td>
                             <td class="p-4">${Number(o.price).toLocaleString()}đ</td>
-                            <td class="p-4 text-emerald-400 font-bold">+${Number(o.commission).toLocaleString()}đ</td>
+                            <td class="p-4 text-emerald-600 font-bold">+${Number(o.commission).toLocaleString()}đ</td>
                             <td class="p-4">
-                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${o.status === 'Thành công' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${o.status === 'Thành công' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-amber-50 text-amber-600 border border-amber-200'}">
                                     ${o.status}
                                 </span>
                             </td>
                         </tr>
                     `).join('');
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">Chưa có đơn hàng nào phát sinh cho ID này trong 30 ngày qua.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">Chưa có đơn hàng nào phát sinh cho ID này trong 30 ngày qua.</td></tr>`;
                 }
             }
             if (code) loadOrders();
@@ -290,7 +373,7 @@ def orders_page():
     return render_template_string(html_orders)
 
 # ==========================================
-# 4. CÁC API BACKEND DÙNG CHO BOT & WEB
+# 4. API BACKEND
 # ==========================================
 
 @app.route('/api/convert', methods=['POST'])
