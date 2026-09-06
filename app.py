@@ -55,7 +55,7 @@ def index():
         
         <!-- Ảnh nền & Lớp làm mờ 80% -->
         <div class="fixed inset-0 -z-20 bg-[url('https://i.postimg.cc/SRsvTY7D/pexels-steve-29404570.jpg')] bg-cover bg-center bg-no-repeat"></div>
-        <div class="fixed inset-0 -z-10 bg-white/80 backdrop-blur-md"></div>
+        <div class="fixed inset-0 -z-10 bg-white/50 backdrop-blur-md"></div>
 
         <!-- HEADER / NAVIGATION -->
         <header class="max-w-6xl w-full mx-auto px-4 py-6 flex items-center justify-between">
