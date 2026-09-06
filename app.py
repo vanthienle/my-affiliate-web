@@ -1,131 +1,136 @@
-from flask import Flask, render_template, request, jsonify, redirect
-import re
-import requests
-import unicodedata
-import sqlite3
-import random
+import os
 import string
+import random
+import sqlite3
+import requests
+from datetime import datetime, timedelta
+from flask import Flask, request, jsonify, redirect, session
+from flask_cors import CORS
 
 app = Flask(__name__)
+app.secret_key = "zalo_affiliate_secret_key_pro"
+CORS(app, supports_credentials=True)
 
 ACCESSTRADE_TOKEN = "4XeA52l7Vi-YlHdi7E1JBh43qeIX0iJ6"
-CAMPAIGNS = {
-    "Shopee": "4751584435713464237",
-    "TikTok": "6648523843406889655"
-}
+BASE_DOMAIN = "https://bot-shopping.onrender.com"
+DB_PATH = "links.db"
 
-# Khởi tạo Cơ sở dữ liệu lưu Link rút gọn
 def init_db():
-    conn = sqlite3.connect('links.db')
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS short_links 
-                 (code TEXT PRIMARY KEY, target_url TEXT)''')
+    """Khởi tạo SQLite Database lưu trữ mã rút gọn"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS links (
+            code TEXT PRIMARY KEY,
+            original_url TEXT,
+            affiliate_url TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     conn.commit()
     conn.close()
 
 init_db()
 
-def generate_short_code():
+def generate_short_code(length=6):
+    """Tạo ngẫu nhiên mã chuỗi rút gọn 6 ký tự"""
     chars = string.ascii_letters + string.digits
-    return ''.join(random.choice(chars) for _ in range(8))
+    return ''.join(random.choice(chars) for _ in range(length))
 
-def save_short_link(target_url):
-    code = generate_short_code()
-    conn = sqlite3.connect('links.db')
-    c = conn.cursor()
-    try:
-        c.execute('INSERT INTO short_links (code, target_url) VALUES (?, ?)', (code, target_url))
-        conn.commit()
-    except:
-        code = generate_short_code()
-        c.execute('INSERT INTO short_links (code, target_url) VALUES (?, ?)', (code, target_url))
-        conn.commit()
-    finally:
-        conn.close()
-    return code
-
-def convert_and_estimate(origin_url, host_url):
-    try:
-        resp = requests.get(origin_url, headers={'User-Agent': 'Mozilla/5.0'}, allow_redirects=True, timeout=5)
-        full_url = resp.url if resp.url else origin_url
-    except:
-        full_url = origin_url
-
-    platform = "Shopee" if any(x in full_url.lower() for x in ["shopee", "shp"]) else ("TikTok" if "tiktok" in full_url.lower() else "Lazada")
-    campaign_id = CAMPAIGNS.get(platform)
-    
-    target_url = full_url.split('?')[0]
-    if platform == "Shopee":
-        m = re.search(r'i\.(\d+)\.(\d+)', full_url) or re.search(r'product/(\d+)/(\d+)', full_url)
-        if m: target_url = f"https://shopee.vn/product/{m.group(1)}/{m.group(2)}"
-    elif platform == "TikTok":
-        m = re.search(r'product/(\d+)', full_url)
-        if m: target_url = f"https://shop.tiktok.com/view/product/{m.group(1)}"
-
-    aff_link = None
-    if campaign_id:
-        api_url = "https://api.accesstrade.vn/v1/product_link/create"
-        payload = {"campaign_id": campaign_id, "urls": [target_url], "utm_source": "web_site"}
-        headers = {"Authorization": f"Token {ACCESSTRADE_TOKEN}", "Content-Type": "application/json"}
-        try:
-            r = requests.post(api_url, json=payload, headers=headers, timeout=5)
-            if r.status_code == 200:
-                data = r.json().get("data", {}).get("success_link", [])
-                if data: aff_link = data[0].get("short_link") or data[0].get("aff_link")
-        except: pass
-
-    final_aff_url = aff_link or target_url
-    
-    # Tạo đường dẫn rút gọn dạng https://domain.com/s/8Kytu
-    code = save_short_link(final_aff_url)
-    short_domain_url = f"{host_url.rstrip('/')}/s/{code}"
-
-    title, price = "Sản phẩm ưu đãi", 0
-    if platform == "Shopee":
-        m = re.search(r'product/(\d+)/(\d+)', target_url)
-        if m:
-            try:
-                res = requests.get(f"https://shopee.vn/api/v4/item/get?itemid={m.group(2)}&shopid={m.group(1)}", headers={'User-Agent': 'Mozilla/5.0'}, timeout=5)
-                if res.status_code == 200:
-                    data = res.json().get("data", {}) or {}
-                    price = float(data.get("price") or data.get("price_min") or 0) / 100000.0
-                    title = data.get("name", title)
-            except: pass
-
-    return {
-        "platform": platform,
-        "title": title,
-        "price": price,
-        "aff_link": final_aff_url,
-        "short_link": short_domain_url
-    }
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-# Router xử lý phân giải link rút gọn /s/<code>
-@app.route('/s/<code_id>')
-def resolve_short_link(code_id):
-    conn = sqlite3.connect('links.db')
-    c = conn.cursor()
-    c.execute('SELECT target_url FROM short_links WHERE code = ?', (code_id,))
-    row = c.fetchone()
-    conn.close()
-    
-    if row:
-        return redirect(row[0], code=302)
-    return "Đường dẫn không tồn tại hoặc đã hết hạn!", 404
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({"status": "running", "service": "Zalo Affiliate Web Service"})
 
 @app.route('/api/convert', methods=['POST'])
-def api_convert():
+def convert_url():
+    """API rút gọn link dạng /s/<code>"""
     data = request.json or {}
-    url = data.get("url", "").strip()
-    if not url:
-        return jsonify({"success": False, "message": "Vui lòng nhập đường dẫn sản phẩm"}), 400
+    raw_url = data.get('url', '').strip()
+    if not raw_url:
+        return jsonify({"success": False, "message": "URL không hợp lệ"}), 400
+
+    code = generate_short_code()
     
-    result = convert_and_estimate(url, request.host_url)
-    return jsonify({"success": True, "data": result})
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO links (code, original_url, affiliate_url) VALUES (?, ?, ?)',
+                   (code, raw_url, raw_url))
+    conn.commit()
+    conn.close()
+
+    short_link = f"{BASE_DOMAIN}/s/{code}"
+    return jsonify({"success": True, "data": {"short_link": short_link, "code": code}})
+
+@app.route('/s/<code>', methods=['GET'])
+def redirect_short_link(code):
+    """Điều hướng link rút gọn sang link sản phẩm/affiliate gốc"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT original_url, affiliate_url FROM links WHERE code = ?', (code,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        target_url = row[1] if row[1] else row[0]
+        return redirect(target_url, code=302)
+    return "Link không tồn tại hoặc đã hết hạn", 404
+
+@app.route('/api/login-tracking', methods=['POST'])
+def login_tracking():
+    """API Đăng nhập bằng Mã theo dõi do Bot Zalo cấp"""
+    data = request.json or {}
+    tracking_code = data.get('tracking_code', '').strip().lower()
+
+    if not tracking_code:
+        return jsonify({"success": False, "message": "Vui lòng nhập Mã theo dõi"}), 400
+
+    session['user_utm'] = tracking_code
+    return jsonify({
+        "success": True,
+        "message": "Đăng nhập thành công",
+        "tracking_code": tracking_code,
+        "redirect": "/app/orders"
+    })
+
+@app.route('/api/user-orders', methods=['GET'])
+def get_user_orders():
+    """API Lấy danh sách đơn hàng tra soát theo Mã theo dõi"""
+    tracking_code = request.args.get('tracking_code') or session.get('user_utm')
+    if not tracking_code:
+        return jsonify({"success": False, "message": "Chưa cung cấp Mã theo dõi"}), 401
+
+    tracking_code = tracking_code.strip().lower()
+    today = datetime.now()
+    start_day = (today - timedelta(days=30)).strftime("%Y-%m-%d")
+    today_str = today.strftime("%Y-%m-%d")
+
+    api_url = f"https://api.accesstrade.vn/v1/transactions?since={start_day}&until={today_str}"
+    headers = {"Authorization": f"Token {ACCESSTRADE_TOKEN}"}
+
+    try:
+        resp = requests.get(api_url, headers=headers, timeout=10)
+        if resp.status_code == 200:
+            all_orders = resp.json().get("data", [])
+            user_orders = []
+            for o in all_orders:
+                utm = str(o.get("utm_source", "")).lower()
+                if tracking_code in utm:
+                    st = str(o.get("status", o.get("order_status", "")))
+                    status_text = "Thành công" if st == "1" else ("Chờ duyệt" if st == "0" else "Đã hủy")
+                    pub_comm = float(o.get("pub_commission", 0) or 0) * 0.8
+                    user_orders.append({
+                        "order_id": o.get("order_id", ""),
+                        "product_name": o.get("product_name", "Sản phẩm TMĐT"),
+                        "price": float(o.get("sales_price", 0) or 0),
+                        "commission": pub_comm,
+                        "status": status_text,
+                        "created_at": o.get("click_time", o.get("created_at", ""))
+                    })
+            return jsonify({"success": True, "tracking_code": tracking_code, "orders": user_orders})
+        return jsonify({"success": False, "message": f"Lỗi AccessTrade HTTP {resp.status_code}"}), 500
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
