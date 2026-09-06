@@ -60,10 +60,11 @@ def index():
         <!-- HEADER / NAVIGATION -->
         <header class="max-w-6xl w-full mx-auto px-4 py-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-[#0068FF] rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
-                    <i class="fa-solid fa-link text-xl"></i>
+                <img src="https://i.postimg.cc/zfvsVWKV/Screenshot-2026-09-06-at-23-56-50.png" alt="Bot Shopping Logo" class="w-11 h-11 object-cover rounded-xl shadow-sm">
+                <div class="hidden sm:block">
+                    <div class="font-bold text-lg text-slate-800 tracking-tight leading-none mb-1">bot-shopping</div>
+                    <div class="text-xs text-slate-500 font-medium leading-none">made by tay ngang gõ phím</div>
                 </div>
-                <span class="font-bold text-lg text-slate-800 tracking-tight hidden sm:block">Zalo Affiliate</span>
             </div>
 
             <nav class="hidden md:flex items-center gap-2 bg-white/80 backdrop-blur border border-slate-200 rounded-full px-4 py-2 shadow-sm">
@@ -158,7 +159,7 @@ def index():
         </main>
 
         <footer class="py-6 text-center text-xs text-slate-400 border-t border-slate-200/60 bg-white/50">
-            © 2026 Zalo Affiliate System. Quản lý bởi Bot Tự Động.
+            © 2026 bot-shopping. Quản lý bởi Bot Tự Động.
         </footer>
 
         <script>
@@ -216,7 +217,7 @@ def login_page():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Đăng Nhập Quản Lý - Zalo Affiliate</title>
+        <title>Đăng Nhập Quản Lý - bot-shopping</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
@@ -294,7 +295,7 @@ def orders_page():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Báo Cáo Hoa Hồng - Zalo Affiliate</title>
+        <title>Báo Cáo Hoa Hồng - bot-shopping</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
