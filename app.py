@@ -1,8 +1,10 @@
 import os
+import re
 import string
 import random
 import sqlite3
 import requests
+import unicodedata
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, redirect, session, render_template_string
 from flask_cors import CORS
@@ -14,6 +16,12 @@ CORS(app, supports_credentials=True)
 ACCESSTRADE_TOKEN = "4XeA52l7Vi-YlHdi7E1JBh43qeIX0iJ6"
 BASE_DOMAIN = "https://bot-shopping.onrender.com"
 DB_PATH = "links.db"
+
+CAMPAIGNS = {
+    "Shopee": "4751584435713464237",
+    "TikTok": "6648523843406889655",
+    "Lazada": ""
+}
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -34,6 +42,20 @@ init_db()
 def generate_short_code(length=6):
     chars = string.ascii_letters + string.digits
     return ''.join(random.choice(chars) for _ in range(length))
+
+def strip_accents(text):
+    if not text:
+        return ""
+    text = unicodedata.normalize('NFD', text)
+    text = ''.join(c for c in text if unicodedata.category(c) != 'Mn')
+    return text.replace('đ', 'd').replace('Đ', 'D').lower()
+
+def get_safe_sender(sender_name):
+    if not sender_name or sender_name.lower() in ["user", "system", "none", ""]:
+        return "khach_an_danh"
+    name = strip_accents(sender_name)
+    safe_name = re.sub(r'[^a-zA-Z0-9]', '', name)
+    return safe_name.lower() if safe_name else "khach_an_danh"
 
 # ==========================================
 # 1. TRANG CHỦ (GIAO DIỆN MỚI - CÓ HÌNH NỀN)
@@ -189,14 +211,11 @@ def index():
 
                 const result = await res.json();
                 if (result.success) {
-                    // Gán link vào ô input hiển thị
                     document.getElementById('outLink').value = result.data.short_link;
-                    // Gắn trực tiếp link vào href của nút "Mua ngay"
                     document.getElementById('buyBtn').href = result.data.short_link;
-                    
                     document.getElementById('resultBox').classList.remove('hidden');
                 } else {
-                    alert('Lỗi chuyển đổi link!');
+                    alert(result.message || 'Lỗi chuyển đổi link!');
                 }
             });
         </script>
@@ -380,27 +399,75 @@ def orders_page():
     return render_template_string(html_orders)
 
 # ==========================================
-# 4. API BACKEND
+# 4. API BACKEND (ĐÃ FIX TRACKING ACCESSTRADE)
 # ==========================================
 
 @app.route('/api/convert', methods=['POST'])
 def convert_url():
     data = request.json or {}
     raw_url = data.get('url', '').strip()
+    user_utm = data.get('utm_source', '').strip()
+
     if not raw_url:
         return jsonify({"success": False, "message": "URL không hợp lệ"}), 400
 
+    # 1. Kiểm tra nếu link truyền vào vốn đã là link Affiliate AccessTrade
+    if any(domain in raw_url.lower() for domain in ["isclix.com", "s.net", "accesstrade"]):
+        affiliate_url = raw_url
+    else:
+        # 2. Tạo link Affiliate chuẩn qua AccessTrade API
+        if "tiktok" in raw_url.lower():
+            platform_key = "TikTok"
+        elif "lazada" in raw_url.lower() or "laz" in raw_url.lower():
+            platform_key = "Lazada"
+        else:
+            platform_key = "Shopee"
+
+        campaign_id = CAMPAIGNS.get(platform_key)
+        
+        # Xác định utm_source cho người dùng
+        if user_utm:
+            safe_utm = user_utm if user_utm.startswith("zalo_") else f"zalo_{get_safe_sender(user_utm)}"
+        elif session.get('user_utm'):
+            safe_utm = session.get('user_utm')
+        else:
+            safe_utm = "zalo_khach_an_danh"
+
+        affiliate_url = raw_url # Dự phòng nếu API lỗi
+
+        if campaign_id:
+            api_url = "https://api.accesstrade.vn/v1/product_link/create"
+            payload = {
+                "campaign_id": campaign_id,
+                "urls": [raw_url],
+                "utm_source": safe_utm
+            }
+            headers = {
+                "Authorization": f"Token {ACCESSTRADE_TOKEN}",
+                "Content-Type": "application/json"
+            }
+            try:
+                response = requests.post(api_url, json=payload, headers=headers, timeout=10)
+                if response.status_code == 200:
+                    res_json = response.json()
+                    success_links = res_json.get("data", {}).get("success_link", [])
+                    if success_links:
+                        item = success_links[0]
+                        affiliate_url = item.get("short_link") or item.get("aff_link") or raw_url
+            except Exception as e:
+                print(f"⚠️ Lỗi AccessTrade API: {e}")
+
+    # 3. Tạo mã rút gọn và lưu affiliate_url vào Database
     code = generate_short_code()
-    
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('INSERT INTO links (code, original_url, affiliate_url) VALUES (?, ?, ?)',
-                   (code, raw_url, raw_url))
+                   (code, raw_url, affiliate_url))
     conn.commit()
     conn.close()
 
     short_link = f"{BASE_DOMAIN}/s/{code}"
-    return jsonify({"success": True, "data": {"short_link": short_link, "code": code}})
+    return jsonify({"success": True, "data": {"short_link": short_link, "aff_link": affiliate_url, "code": code}})
 
 @app.route('/s/<code>', methods=['GET'])
 def redirect_short_link(code):
