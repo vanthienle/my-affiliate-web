@@ -46,19 +46,19 @@ def generate_short_code(length=6):
 def strip_accents(text):
     if not text:
         return ""
-    text = unicodedata.normalize('NFD', text)
+    text = unicodedata.normalize('NFD', str(text))
     text = ''.join(c for c in text if unicodedata.category(c) != 'Mn')
     return text.replace('đ', 'd').replace('Đ', 'D').lower()
 
 def get_safe_sender(sender_name):
-    if not sender_name or sender_name.lower() in ["user", "system", "none", ""]:
+    if not sender_name or str(sender_name).lower() in ["user", "system", "none", "", "null"]:
         return "khach_an_danh"
     name = strip_accents(sender_name)
     safe_name = re.sub(r'[^a-zA-Z0-9]', '', name)
     return safe_name.lower() if safe_name else "khach_an_danh"
 
 # ==========================================
-# 1. TRANG CHỦ (GIAO DIỆN MỚI - CÓ HÌNH NỀN)
+# 1. TRANG CHỦ (GIAO DIỆN WEB)
 # ==========================================
 
 @app.route('/', methods=['GET'])
@@ -75,11 +75,9 @@ def index():
     </head>
     <body class="text-slate-800 font-sans min-h-screen flex flex-col justify-between relative overflow-x-hidden">
         
-        <!-- Ảnh nền & Lớp làm mờ 80% -->
         <div class="fixed inset-0 -z-20 bg-[url('https://i.postimg.cc/SRsvTY7D/pexels-steve-29404570.jpg')] bg-cover bg-center bg-no-repeat"></div>
         <div class="fixed inset-0 -z-10 bg-white/50 backdrop-blur-md"></div>
 
-        <!-- HEADER / NAVIGATION -->
         <header class="max-w-6xl w-full mx-auto px-4 py-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <img src="https://i.postimg.cc/zfvsVWKV/Screenshot-2026-09-06-at-23-56-50.png" alt="Bot Shopping Logo" class="w-11 h-11 object-cover rounded-xl shadow-sm">
@@ -108,9 +106,7 @@ def index():
             </div>
         </header>
 
-        <!-- MAIN HERO CONTENT -->
         <main class="max-w-4xl mx-auto px-4 py-16 text-center flex-1 flex flex-col items-center justify-center">
-            
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-blue-100 text-[#0068FF] text-xs font-semibold mb-6 shadow-sm">
                 <span class="w-2 h-2 rounded-full bg-[#0068FF] animate-pulse"></span> Công cụ tối ưu doanh thu Affiliate
             </div>
@@ -124,10 +120,7 @@ def index():
                 Tạo link rút gọn và theo dõi hoa hồng từ các nền tảng thương mại điện tử hàng đầu trực tiếp trên hệ thống của chúng tôi.
             </p>
 
-            <!-- KHUNG DÁN LINK CONVERT TRỰC TIẾP -->
             <div class="w-full bg-white/95 backdrop-blur-xl rounded-[2rem] p-5 md:p-8 shadow-2xl shadow-blue-900/10 border border-white/50 text-left relative overflow-hidden">
-                
-                <!-- Bảng các sàn hỗ trợ -->
                 <div class="flex items-center gap-6 mb-5 px-1">
                     <span class="flex items-center gap-2 text-sm font-semibold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100">
                         <i class="fa-solid fa-bag-shopping"></i> Shopee
@@ -140,7 +133,6 @@ def index():
                     </span>
                 </div>
 
-                <!-- Input Box Group -->
                 <div class="flex flex-col md:flex-row gap-3">
                     <button type="button" id="pasteBtn" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-semibold text-sm transition flex items-center justify-center gap-2 whitespace-nowrap">
                         <i class="fa-solid fa-paste"></i> Dán link
@@ -156,12 +148,10 @@ def index():
                     </button>
                 </div>
 
-                <!-- KHU VỰC HIỆN KẾT QUẢ LINK AFTER CONVERT -->
                 <div id="resultBox" class="hidden mt-6 pt-6 border-t border-slate-100">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">LINK CHIA SẺ CỦA BẠN:</label>
                     <div class="flex gap-2">
                         <input type="text" id="outLink" readonly class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold rounded-xl px-4 py-3 text-sm focus:outline-none">
-                        <!-- NÚT MUA NGAY -->
                         <a href="#" id="buyBtn" target="_blank" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition flex items-center justify-center gap-2 whitespace-nowrap shadow-md">
                             <i class="fa-solid fa-cart-shopping"></i> Mua ngay
                         </a>
@@ -169,7 +159,6 @@ def index():
                 </div>
             </div>
 
-            <!-- Nút Action Phụ -->
             <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="https://zalo.me/g/gzjkxxocyzaaacu81hp6" target="_blank" class="px-8 py-3.5 bg-white border-2 border-[#0068FF] text-[#0068FF] hover:bg-blue-50 font-bold rounded-full transition shadow-sm text-sm inline-flex items-center justify-center gap-2">
                     <i class="fa-solid fa-users"></i> Tham gia cộng đồng Zalo
@@ -185,7 +174,6 @@ def index():
         </footer>
 
         <script>
-            // Xử lý nút Dán từ Clipboard
             document.getElementById('pasteBtn').addEventListener('click', async () => {
                 try {
                     const text = await navigator.clipboard.readText();
@@ -195,7 +183,6 @@ def index():
                 }
             });
 
-            // Xử lý Chuyển đổi Link
             document.getElementById('convertBtn').addEventListener('click', async () => {
                 const url = document.getElementById('rawUrl').value.trim();
                 if (!url) {
@@ -225,7 +212,7 @@ def index():
     return render_template_string(html_home)
 
 # ==========================================
-# 2. TRANG ĐĂNG NHẬP BẰNG ID (/login)
+# 2. TRANG ĐĂNG NHẬP TRA CỨU (/login)
 # ==========================================
 
 @app.route('/login', methods=['GET'])
@@ -241,8 +228,6 @@ def login_page():
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
     <body class="text-slate-800 min-h-screen flex flex-col items-center justify-center p-4 relative">
-        
-        <!-- Ảnh nền & Lớp làm mờ 80% -->
         <div class="fixed inset-0 -z-20 bg-[url('https://i.postimg.cc/SRsvTY7D/pexels-steve-29404570.jpg')] bg-cover bg-center bg-no-repeat"></div>
         <div class="fixed inset-0 -z-10 bg-white/80 backdrop-blur-md"></div>
 
@@ -322,8 +307,6 @@ def orders_page():
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
     <body class="text-slate-800 min-h-screen p-4 md:p-8 relative">
-        
-        <!-- Ảnh nền & Lớp làm mờ 80% -->
         <div class="fixed inset-0 -z-20 bg-[url('https://i.postimg.cc/SRsvTY7D/pexels-steve-29404570.jpg')] bg-cover bg-center bg-no-repeat"></div>
         <div class="fixed inset-0 -z-10 bg-white/80 backdrop-blur-md"></div>
 
@@ -399,47 +382,56 @@ def orders_page():
     return render_template_string(html_orders)
 
 # ==========================================
-# 4. API BACKEND (ĐÃ FIX TRACKING ACCESSTRADE)
+# 4. API BACKEND & CHUYỂN ĐỔI LINK
 # ==========================================
 
 @app.route('/api/convert', methods=['POST'])
 def convert_url():
     data = request.json or {}
-    raw_url = data.get('url', '').strip()
-    user_utm = data.get('utm_source', '').strip()
+    
+    # 1. Ép kiểu str an toàn chống crash do Zalo Bot gửi integer/None
+    raw_url = str(data.get('url', '') or '').strip()
+    user_utm = str(data.get('utm_source', '') or '').strip()
 
     if not raw_url:
         return jsonify({"success": False, "message": "URL không hợp lệ"}), 400
 
-    # 1. Kiểm tra nếu link truyền vào vốn đã là link Affiliate AccessTrade
-    if any(domain in raw_url.lower() for domain in ["isclix.com", "s.net", "accesstrade"]):
-        affiliate_url = raw_url
+    # 2. Tự động giải nén link ngắn nếu người dùng dán link s.shopee.vn / vt.tiktok.com
+    final_url = raw_url
+    if any(domain in raw_url.lower() for domain in ["s.shopee.vn", "shope.ee", "vt.tiktok.com"]):
+        try:
+            r = requests.head(raw_url, allow_redirects=True, timeout=2)
+            final_url = r.url
+        except Exception:
+            final_url = raw_url
+
+    # 3. Kiểm tra nếu link đã là link Affiliate
+    if any(domain in final_url.lower() for domain in ["isclix.com", "s.net", "accesstrade"]):
+        affiliate_url = final_url
     else:
-        # 2. Tạo link Affiliate chuẩn qua AccessTrade API
-        if "tiktok" in raw_url.lower():
+        if "tiktok" in final_url.lower():
             platform_key = "TikTok"
-        elif "lazada" in raw_url.lower() or "laz" in raw_url.lower():
+        elif "lazada" in final_url.lower() or "laz" in final_url.lower():
             platform_key = "Lazada"
         else:
             platform_key = "Shopee"
 
         campaign_id = CAMPAIGNS.get(platform_key)
         
-        # Xác định utm_source cho người dùng
-        if user_utm:
+        if user_utm and user_utm.lower() not in ["none", "", "null"]:
             safe_utm = user_utm if user_utm.startswith("zalo_") else f"zalo_{get_safe_sender(user_utm)}"
         elif session.get('user_utm'):
             safe_utm = session.get('user_utm')
         else:
             safe_utm = "zalo_khach_an_danh"
 
-        affiliate_url = raw_url # Dự phòng nếu API lỗi
+        affiliate_url = final_url
 
         if campaign_id:
             api_url = "https://api.accesstrade.vn/v1/product_link/create"
             payload = {
                 "campaign_id": campaign_id,
-                "urls": [raw_url],
+                "urls": [final_url],
                 "utm_source": safe_utm
             }
             headers = {
@@ -447,17 +439,18 @@ def convert_url():
                 "Content-Type": "application/json"
             }
             try:
-                response = requests.post(api_url, json=payload, headers=headers, timeout=10)
+                # Ép timeout xuống 2.5 giây để Zalo Bot không bị Timeout ngắt kết nối
+                response = requests.post(api_url, json=payload, headers=headers, timeout=2.5)
                 if response.status_code == 200:
                     res_json = response.json()
                     success_links = res_json.get("data", {}).get("success_link", [])
                     if success_links:
                         item = success_links[0]
-                        affiliate_url = item.get("short_link") or item.get("aff_link") or raw_url
+                        affiliate_url = item.get("short_link") or item.get("aff_link") or final_url
             except Exception as e:
-                print(f"⚠️ Lỗi AccessTrade API: {e}")
+                print(f"⚠️ AccessTrade API Timeout/Lỗi: {e}")
 
-    # 3. Tạo mã rút gọn và lưu affiliate_url vào Database
+    # 4. Lưu mã rút gọn vào SQLite
     code = generate_short_code()
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -485,7 +478,7 @@ def redirect_short_link(code):
 @app.route('/api/login-tracking', methods=['POST'])
 def login_tracking():
     data = request.json or {}
-    tracking_code = data.get('tracking_code', '').strip().lower()
+    tracking_code = str(data.get('tracking_code', '') or '').strip().lower()
 
     if not tracking_code:
         return jsonify({"success": False, "message": "Vui lòng nhập Mã theo dõi"}), 400
@@ -504,7 +497,7 @@ def get_user_orders():
     if not tracking_code:
         return jsonify({"success": False, "message": "Chưa cung cấp Mã theo dõi"}), 401
 
-    tracking_code = tracking_code.strip().lower()
+    tracking_code = str(tracking_code).strip().lower()
     today = datetime.now()
     start_day = (today - timedelta(days=30)).strftime("%Y-%m-%d")
     today_str = today.strftime("%Y-%m-%d")
